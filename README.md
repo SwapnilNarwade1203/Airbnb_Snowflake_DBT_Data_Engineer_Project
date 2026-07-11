@@ -1,208 +1,290 @@
 # Snowflake + AWS S3 + dbt Data Engineering Project
 
+![Snowflake](https://img.shields.io/badge/Snowflake-29B5E8?style=for-the-badge&logo=snowflake&logoColor=white)
+![AWS S3](https://img.shields.io/badge/AWS_S3-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+![dbt](https://img.shields.io/badge/dbt-FF694B?style=for-the-badge&logo=dbt&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![SQL](https://img.shields.io/badge/SQL-336791?style=for-the-badge)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github)
+
 ## Overview
 
-This project demonstrates an end-to-end modern data engineering pipeline using AWS S3, Snowflake, dbt, and Python. The pipeline ingests raw CSV files into Snowflake, transforms them using dbt following the Medallion Architecture, and prepares clean analytical datasets.
+This project demonstrates an end-to-end **ELT (Extract, Load, Transform)** pipeline using **AWS S3**, **Snowflake**, **dbt**, and **Python**.
 
-The project showcases industry-standard ELT practices including cloud storage, data warehousing, SQL transformations, testing, documentation, and data modeling.
+Raw Airbnb datasets are uploaded to Amazon S3, ingested into Snowflake using an External Stage and `COPY INTO` command, transformed using dbt following the **Medallion Architecture (Bronze → Silver → Gold)**, and prepared for analytics and reporting.
+
+The project demonstrates modern cloud data engineering practices including cloud storage, data warehousing, SQL transformations, modular data modeling, testing, documentation, and version control.
 
 ---
 
-## Architecture
+# Architecture
 
+<p align="center">
+  <img src="images/a_clean_infographic_diagram_on_a_white_background.png" alt="Snowflake AWS S3 dbt Architecture" width="1000">
+</p>
+
+---
+
+## Technology Stack
+
+| Category | Tools |
+|----------|-------|
+| Cloud Storage | AWS S3 |
+| Data Warehouse | Snowflake |
+| Data Transformation | dbt Core |
+| Programming | Python |
+| Query Language | SQL |
+| Version Control | Git & GitHub |
+| Environment Manager | uv |
+
+---
+
+# Architecture Components
+
+| Component | Purpose |
+|-----------|---------|
+| AWS S3 | Stores raw Airbnb CSV files |
+| Snowflake Storage Integration | Secure connection between Snowflake and AWS |
+| External Stage | Reads files directly from S3 |
+| COPY INTO | Loads raw data into Snowflake |
+| Bronze Layer | Raw loaded data |
+| Silver Layer | Cleaned and standardized data |
+| Gold Layer | Business-ready analytical tables |
+| dbt | Data transformations and testing |
+| Python | Utility scripts and automation |
+
+---
+
+# Data Pipeline Workflow
+
+```text
+Raw Airbnb CSV Files
+          │
+          ▼
+      Amazon S3
+          │
+          ▼
+Snowflake Storage Integration
+          │
+          ▼
+    External Stage
+          │
+          ▼
+      COPY INTO
+          │
+          ▼
+ Bronze (Raw Tables)
+          │
+          ▼
+Silver (Staging Models)
+          │
+          ▼
+Intermediate Models
+          │
+          ▼
+ Gold (Mart Models)
+          │
+          ▼
+ Analytics / Reporting
 ```
-                    Raw CSV Files
-                          │
-                          ▼
-                     AWS S3 Bucket
-                          │
-                          ▼
-             Snowflake External Stage
-                          │
-                          ▼
-                 Snowflake Raw Tables
-                          │
-                    (Bronze Layer)
-                          │
-                          ▼
-                dbt Staging Models
-                          │
-                    (Silver Layer)
-                          │
-                          ▼
-            dbt Intermediate Models
-                          │
-                          ▼
-                 Mart / Analytics Layer
-                          │
-                          ▼
-              Business Ready Data
-```
 
 ---
 
-## Tech Stack
+# Project Structure
 
-- Snowflake
-- AWS S3
-- dbt Core
-- Python
-- SQL
-- Git & GitHub
-- uv (Python package manager)
-
----
-
-## Project Structure
-
-.
+```text
+Airbnb_Snowflake_DBT_Data_Engineer_Project/
+│
+├── images/
+│   └── a_clean_infographic_diagram_on_a_white_background.png
+│
 ├── SourceData/
-│   └── Raw CSV files
+│   ├── listings.csv
+│   ├── calendar.csv
+│   └── reviews.csv
 │
 ├── aws_dbt_snowflake_project/
+│   ├── analyses/
+│   ├── logs/
+│   ├── macros/
 │   ├── models/
 │   │   ├── staging/
 │   │   ├── intermediate/
 │   │   └── marts/
-│   │
-│   ├── macros/
-│   ├── tests/
-│   ├── snapshots/
 │   ├── seeds/
-│   └── dbt_project.yml
+│   ├── snapshots/
+│   ├── target/
+│   ├── tests/
+│   ├── dbt_project.yml
+│   ├── packages.yml
+│   └── profiles.yml
 │
 ├── main.py
 ├── pyproject.toml
 ├── uv.lock
 ├── .python-version
+├── .gitignore
 └── README.md
-
-
-## Data Pipeline Workflow
-
-### Step 1 – Store Raw Data
-
-Raw CSV files are uploaded to an AWS S3 bucket.
+```
 
 ---
 
-### Step 2 – Create Snowflake Stage
+# Dataset
 
-Snowflake Storage Integration and External Stage are configured to securely access data stored in S3.
+The project uses Airbnb datasets containing information such as:
+
+- Listings
+- Reviews
+- Calendar Availability
+- Pricing Information
+- Hosts
+- Locations
+
+The datasets are uploaded to **Amazon S3** before being ingested into Snowflake.
 
 ---
 
-### Step 3 – Load Data
+# ELT Process
 
-Data is loaded into Snowflake raw tables using:
+## Step 1 — Upload Data
 
-- COPY INTO
-- File Formats
-- External Stage
+Upload raw CSV files to an Amazon S3 bucket.
 
 ---
 
-### Step 4 – Transform Data with dbt
+## Step 2 — Configure Snowflake
 
-dbt performs multiple transformations including:
+- Create Warehouse
+- Create Database
+- Create Schema
+- Create Storage Integration
+- Create File Format
+- Create External Stage
 
-- Removing duplicates
+---
+
+## Step 3 — Load Data
+
+Load raw data using
+
+```sql
+COPY INTO table_name
+FROM @stage_name;
+```
+
+---
+
+## Step 4 — Transform Data using dbt
+
+Transformations include:
+
+- Removing duplicate records
 - Handling NULL values
-- Standardizing formats
-- Renaming columns
+- Standardizing column names
+- Data type conversions
 - Filtering invalid records
 - Business rule implementation
+- Creating surrogate keys
+- Incremental loading
 
 ---
 
-### Step 5 – Data Modeling
+## Step 5 — Build Analytical Models
 
 The project follows the Medallion Architecture.
 
 ### Bronze Layer
 
-- Raw data
+- Raw Data
 - Minimal transformations
 
 ### Silver Layer
 
-- Cleaned data
-- Standardized formats
-- Data quality improvements
+- Cleaned Data
+- Standardized Data
+- Quality Checks
 
 ### Gold Layer
 
-Business-ready analytical tables optimized for reporting.
+- Fact Tables
+- Dimension Tables
+- Reporting Tables
 
 ---
 
-## Features
+# dbt Concepts Used
+
+- Models
+- Sources
+- ref()
+- source()
+- Macros
+- Variables
+- Incremental Models
+- Materializations
+- Seeds
+- Snapshots
+- Documentation
+- Tests
+
+---
+
+# Data Quality Tests
+
+The project implements dbt tests including:
+
+- Unique Tests
+- Not Null Tests
+- Accepted Values Tests
+- Relationship Tests
+- Custom SQL Tests
+
+---
+
+# Features
 
 - End-to-End ELT Pipeline
 - AWS S3 Integration
-- Snowflake Data Warehouse
-- dbt Transformations
-- Modular SQL Models
-- Data Quality Tests
-- Documentation
+- Snowflake Cloud Data Warehouse
+- dbt Data Modeling
+- Modular SQL Transformations
+- Automated Data Quality Tests
+- Documentation Generation
 - Git Version Control
 - Reproducible Python Environment using uv
 
 ---
 
-## dbt Concepts Used
-
-- Models
-- Sources
-- ref()
-- Materializations
-- Tests
-- Documentation
-- Macros
-- Variables
-- Incremental Models
-- Snapshots
-- Seeds
-
----
-
-## Data Quality Checks
-
-Examples include:
-
-- Unique Key Tests
-- Not Null Tests
-- Accepted Values Tests
-- Relationships Tests
-- Custom SQL Tests
-
----
-
-## Skills Demonstrated
+# Skills Demonstrated
 
 - Data Engineering
 - SQL
 - Snowflake
 - AWS S3
 - dbt
-- ELT Pipelines
-- Data Warehousing
-- Medallion Architecture
-- Data Modeling
-- Git & GitHub
 - Python
+- ELT Pipelines
+- Medallion Architecture
+- Cloud Data Warehousing
+- Data Modeling
+- Data Quality Testing
+- Git & GitHub
 
 ---
 
-## Getting Started
+# Getting Started
 
-### Clone Repository
+## Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/SwapnilNarwade1203/Airbnb_Snowflake_DBT_Data_Engineer_Project.git
 ```
 
-### Install Dependencies
+---
+
+## Install Dependencies
+
+Using uv
 
 ```bash
 uv sync
@@ -214,13 +296,17 @@ or
 pip install -r requirements.txt
 ```
 
-### Activate Environment
+---
+
+## Run Python Scripts
 
 ```bash
 uv run python main.py
 ```
 
-### Run dbt
+---
+
+## Run dbt
 
 ```bash
 dbt debug
@@ -234,28 +320,32 @@ dbt docs serve
 
 ---
 
-## Future Improvements
+# Future Improvements
 
-- Snowpipe Automation
-- Airflow Orchestration
-- CI/CD Pipeline
+- Snowpipe for Automated Ingestion
+- Apache Airflow Orchestration
+- CI/CD Pipeline with GitHub Actions
 - Power BI Dashboard
-- Incremental Loading
-- Monitoring & Alerts
+- Incremental Data Loading
 - Data Observability
+- Monitoring & Alerting
 
 ---
 
-## Author
+# Author
 
 **Swapnil Narwade**
 
-GitHub: https://github.com/SwapnilNarwade1203
+**GitHub**
 
-LinkedIn: https://www.linkedin.com/in/swapnilnarwade1203/
+https://github.com/SwapnilNarwade1203
+
+**LinkedIn**
+
+https://www.linkedin.com/in/swapnilnarwade1203/
 
 ---
 
-## License
+# License
 
-This project is intended for educational and portfolio purposes.
+This project is intended for educational purposes, hands-on learning, and portfolio demonstration.
